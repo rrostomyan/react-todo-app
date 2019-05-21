@@ -5,7 +5,9 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { withStyles } from "@material-ui/core/styles";
 import ToDoItem from "./components/ToDoItem";
+import EditModal from "./components/modal/edit";
 import "./App.css";
+
 
 const styles = () => ({
   app: {
@@ -24,7 +26,9 @@ class App extends React.Component {
     super(props);
     this.state = {
       inputValue: "",
-      list: []
+      list: [],
+      showEditModal: false,
+      editedItem: null
     };
   }
 
@@ -45,6 +49,31 @@ class App extends React.Component {
       const index = list.indexOf(itemToDelete);
       this.setState({
         list: [...list.slice(0, index), ...list.slice(index + 1)]
+      });
+    }
+  };
+
+  handleEditItem = item => {
+    this.setState({ showEditModal: true, editedItem: item });
+  };
+
+  onEditModalClose = item => {
+    this.setState({ showEditModal: false, editedItem: null });
+  };
+
+  onSave = (itemId, name) => {
+    const { list } = this.state;
+    const itemToUpdate = list.find(item => item.id === itemId);
+    if (itemToUpdate) {
+      const index = list.indexOf(itemToUpdate);
+      this.setState({
+        list: [
+          ...list.slice(0, index),
+          { ...itemToUpdate, name },
+          ...list.slice(index + 1)
+        ],
+        showEditModal: false,
+        editedItem: null
       });
     }
   };
@@ -76,6 +105,7 @@ class App extends React.Component {
         key={item.id}
         item={item}
         onDelete={this.handleDeleteItem}
+        onEdit={this.handleEditItem}
         onCheckChange={this.handleItemCheckChange}
       />
     );
@@ -98,7 +128,7 @@ class App extends React.Component {
   };
 
   render() {
-    const { inputValue, list } = this.state;
+    const { inputValue, list, showEditModal, editedItem } = this.state;
     const { classes } = this.props;
     return (
       <div className={classes.app}>
@@ -120,6 +150,13 @@ class App extends React.Component {
           </Button>
         </div>
         {list.map(item => this.renderItem(item))}
+        {showEditModal && (
+          <EditModal
+            item={editedItem}
+            onClose={this.onEditModalClose}
+            onSave={this.onSave}
+          />
+        )}
       </div>
     );
   }

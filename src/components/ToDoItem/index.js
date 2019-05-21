@@ -4,7 +4,6 @@ import classNames from "classnames";
 import Button from "@material-ui/core/Button";
 import { withStyles } from "@material-ui/core/styles";
 
-
 const styles = () => ({
   root: {
     textAlign: "center"
@@ -30,6 +29,12 @@ class ToDoItem extends React.Component {
     event.stopPropagation();
   };
 
+  handleEdit = event => {
+    const { onEdit, item } = this.props;
+    onEdit(item);
+    event.stopPropagation();
+  };
+
   handleItemClick = () => {
     const {
       onCheckChange,
@@ -52,6 +57,9 @@ class ToDoItem extends React.Component {
         >
           {checked && <span>checked</span>}
           {name}
+          <Button variant="contained" color="primary" onClick={this.handleEdit}>
+            Edit
+          </Button>
           <Button
             variant="contained"
             color="primary"
